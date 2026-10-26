@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Artistic Muse | Inspire, Create, Enchant</title>
+<meta name="description" content="The Artistic Muse - Inspire, Create, Enchant. Handmade resin keychains, candles, bookmarks, bouquets and gifts.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--ink:#14110f;--cream:#f7efe0}
+  *{box-sizing:border-box;margin:0;font-family:'Cormorant Garamond',serif}
+  body{background:var(--ink);color:var(--cream)}
+  header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #d4af3744;position:sticky;top:0;background:var(--ink);z-index:5}
+  header img{height:46px}
+  .cartbtn{background:none;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:30px;cursor:pointer;font-size:16px}
+  .hero{text-align:center;padding:50px 20px 30px}
+  .hero img{width:min(300px,70%);border-radius:50%}
+  .hero h1{font-family:'Great Vibes',cursive;color:var(--gold);font-size:44px;font-weight:400;margin-top:10px}
+  .hero p{letter-spacing:4px;font-size:14px;text-transform:uppercase;opacity:.8}
+  .hero a{display:inline-block;margin-top:20px;background:var(--gold);color:var(--ink);padding:12px 28px;border-radius:30px;text-decoration:none;font-weight:600}
+  nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:20px}
+  nav button{background:none;border:1px solid #d4af3766;color:var(--cream);padding:8px 18px;border-radius:30px;cursor:pointer;font-size:16px}
+  nav button.on{background:var(--gold);color:var(--ink)}
+  #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px;padding:10px 20px 50px;max-width:1000px;margin:auto}
+  .card{background:var(--cream);color:var(--ink);border-radius:16px;overflow:hidden;box-shadow:0 8px 24px #0006}
+  .card img{width:100%;aspect-ratio:1;object-fit:cover;background:#e8dcc3}
+  .info{padding:14px;text-align:center}
+  .info h3{font-size:21px}
+  .info small{display:block;opacity:.7;margin:2px 0 6px}
+  .price{color:#8a6d12;font-size:22px;font-weight:600}
+  .info button{margin-top:8px;width:100%;background:var(--ink);color:var(--gold);border:0;padding:10px;border-radius:30px;cursor:pointer;font-size:16px}
+  .info .buy{background:var(--gold);color:var(--ink);font-weight:600}
+  footer{text-align:center;padding:30px;border-top:1px solid #d4af3744;opacity:.8}
+  #drawer{display:none;position:fixed;inset:0;background:#000a;z-index:10;overflow:auto}
+  #panel{background:var(--cream);color:var(--ink);max-width:430px;margin:30px auto;padding:22px;border-radius:16px}
+  #panel input{width:100%;padding:10px;margin:5px 0;border:1px solid #bbb;border-radius:8px;font-size:16px}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #0002}
+  .row button{width:28px;height:28px;border-radius:50%;border:1px solid var(--ink);background:none;cursor:pointer}
+  .go{width:100%;margin-top:10px;padding:12px;border:0;border-radius:30px;background:#25d366;color:#fff;font-size:17px;cursor:pointer}
+  .close{width:100%;margin-top:8px;padding:10px;border:1px solid var(--ink);border-radius:30px;background:none;cursor:pointer;font-size:16px}
+  #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--ink);padding:10px 22px;border-radius:30px;opacity:0;transition:.3s;z-index:20;pointer-events:none}
+  #toast.show{opacity:1}
+  .float{position:fixed;bottom:20px;right:20px;background:var(--gold);color:var(--ink);border:0;border-radius:30px;padding:14px 22px;font-size:18px;cursor:pointer;z-index:9;box-shadow:0 4px 14px #0008}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo.jpg" alt="The Artistic Muse">
+  <button class="cartbtn" onclick="openCart()">🛍 Cart (<span id="count">0</span>)</button>
+</header>
+
+<section class="hero">
+  <img src="logo.jpg" alt="">
+  <h1>Handmade with love</h1>
+  <p>Inspire · Create · Enchant</p>
+  <a href="#shop">Shop Now</a>
+</section>
+
+<div id="shop"></div>
+<nav id="cats"></nav>
+<div id="grid"></div>
+
+<footer>✦ The Artistic Muse ✦<br>Every piece is handmade just for you</footer>
+
+<div id="toast">Added to cart ✓</div>
+<button class="float" onclick="openCart()">🛍 View Cart (<span id="count2">0</span>)</button>
+
+<div id="drawer"><div id="panel">
+  <h2>Your Cart</h2>
+  <div id="items"></div>
+  <p style="margin:12px 0;font-size:20px"><b>Total: ₹<span id="total">0</span></b></p>
+  <input id="name" placeholder="Your name">
+  <input id="phone" placeholder="Phone number">
+  <input id="addr" placeholder="Full delivery address">
+  <button class="go" onclick="placeOrder()">Place Order on WhatsApp</button>
+  <button class="close" onclick="closeCart()">Close</button>
+</div></div>
+
+<script>
+const OWNER = "917303056762";
+
+const products = [
+  {id:1,  name:"Seashell Gel Candle",    sub:"Ocean-blue, with shells & pearls", price:79,  cat:"Candles",   img:"candle.jpg"},
+  {id:2,  name:"Flower Keychain",        sub:"Soft pink handmade blossom",       price:79,  cat:"Keychains", img:"keychain.jpg"},
+  {id:3,  name:"Resin Bookmark",         sub:"Blue & gold leaf with tassel",     price:79,  cat:"Bookmarks", img:"bookmark.jpg"},
+  {id:4,  name:"Puzzle Couple Keychain", sub:"Pair of matching pieces",          price:59,  cat:"Keychains", img:"puzzle.jpg"},
+  {id:5,  name:"Love Letter Keychain",   sub:"Envelope with red hearts",         price:59,  cat:"Keychains", img:"envelope.jpg"},
+  {id:6,  name:"Butterfly Keychain",     sub:"Hand-painted blue butterfly",      price:59,  cat:"Keychains", img:"butterfly.jpg"},
+  {id:7,  name:"Evil Eye Keychain",      sub:"Soft pom-pom nazar charm",         price:59,  cat:"Keychains", img:"evileye.jpg"},
+  {id:8,  name:"Resin Letter Keychain",  sub:"Silver flakes, pick your letter",  price:59,  cat:"Keychains", img:"letter-r.jpg"},
+  {id:9,  name:"Gold Letter Keychain",   sub:"Pink & gold, pick your letter",    price:59,  cat:"Keychains", img:"letter-nv.jpg"},
+  {id:10, name:"Floral Letter Necklace", sub:"Pressed flowers & gold flakes",    price:59,  cat:"Necklaces", img:"necklace.jpg"},
+  {id:11, name:"Pink Flower Bouquet",    sub:"Handmade, made to your choice",    price:null,cat:"Bouquets",  img:"bouquet-pink.jpg"},
+  {id:12, name:"Paper Flower Bouquet",   sub:"Handmade, made to your choice",    price:null,cat:"Bouquets",  img:"bouquet-paper.jpg"},
+  {id:13, name:"Resin Trinket Tray",     sub:"Teal ocean wave, silver flakes",   price:149, cat:"Trays",     img:"tray.jpg"},
+  {id:14, name:"Earring Gift Box (12 Pairs)", sub:"Pearls, bows & flowers in a velvet box", price:699, cat:"Earrings", img:"earrings.jpg"},
+  {id:15, name:"Cherry Keychain",        sub:"Soft red cherries with green leaves", price:49, cat:"Keychains", img:"cherry.jpg"},
+  {id:16, name:"Fluffy Bow Bag Charm",   sub:"Soft pink pipe-cleaner bow",       price:49,  cat:"Bag Charms",img:"bow-charm.jpg"},
+  {id:17, name:"Pink Flower Charm",      sub:"Pink petals with green leaves",    price:49,  cat:"Bag Charms",img:"pink-flower.jpg"},
+  {id:18, name:"Hand-Drawn Bookmarks",   sub:"Watercolor and pen art",           price:49,  cat:"Bookmarks", img:"art-bookmark.jpg"},
+  {id:19, name:"Blossom Pearl Charm",    sub:"Pink blossom with pearl strap",    price:49,  cat:"Bag Charms",img:"blossom-pearl.jpg"},
+  {id:20, name:"Custom Resin Photo Frame", sub:"Made with your photo, as you like", price:null, cat:"Custom Gifts", img:"frame.jpg"},
+  {id:21, name:"Pearl Bow Earrings",     sub:"Pink satin bows with pearls",      price:49,  cat:"Earrings",  img:"bow-earrings.jpg"},
+  {id:22, name:"Golden Bell Chain Earrings", sub:"Long gold chains with tiny bells", price:59, cat:"Earrings", img:"bell-earrings.jpg"},
+  {id:23, name:"Bright Paper Bouquet",   sub:"Colourful paper flowers, made to your choice", price:null, cat:"Bouquets", img:"bouquet-bright.jpg"},
+  {id:24, name:"Pastel Paper Bouquet",   sub:"Soft paper flowers, made to your choice",      price:null, cat:"Bouquets", img:"bouquet-pastel.jpg"},
+  {id:25, name:"Rose Petal Resin Earrings", sub:"Real rose petals & gold flakes", price:400, cat:"Earrings", img:"petal-earrings.jpg"},
+  {id:26, name:"Fluffy Heart Earrings",  sub:"Soft pink pipe-cleaner hearts",    price:49,  cat:"Earrings",  img:"heart-earrings.jpg"},
+  {id:27, name:"Fluffy Butterfly Keychain", sub:"Pick your colour, pearl centre", price:49, cat:"Keychains", img:"butterfly-keychain.jpg"},
+  {id:28, name:"Oxidised Earring Gift Box (16 Pairs)", sub:"Jhumkas, chandbalis & more", price:1199, cat:"Earrings", img:"oxidised-box.jpg"},
+  {id:29, name:"Barfi Candle", sub:"Sweet-shaped candle with silver leaf", price:50, cat:"Candles", img:"barfi-candle.jpg"},
+  {id:30, name:"Laddoo Candle", sub:"Laddoo-shaped candle with silver leaf", price:50, cat:"Candles", img:"laddoo-candle.jpg"},
+  {id:31, name:"Rose Flower Candle", sub:"Petal-shaped candles in soft colours", price:79, cat:"Candles", img:"rose-candle.jpg"},
+  {id:32, name:"Tulip Candle", sub:"Tulip-bud candles, pick your colour", price:79, cat:"Candles", img:"tulip-candle.jpg"},
+  {id:33, name:"Galaxy Gel Candle", sub:"Deep blue gel with gold flakes & pearls", price:79, cat:"Candles", img:"galaxy-candle.jpg"},
+  {id:34, name:"Layered Glass Candle", sub:"Soft white wax with a pink gel layer", price:79, cat:"Candles", img:"layered-candle.jpg"}
+];
+
+let cart = {}, cat = "All", buyId = null, buyQty = 1;
+
+function render(){
+  const cats = ["All", ...new Set(products.map(p => p.cat))];
+  document.getElementById("cats").innerHTML = cats.map(c =>
+    `<button class="${c===cat?'on':''}" onclick="cat='${c}';render()">${c}</button>`).join("");
+  document.getElementById("grid").innerHTML = products
+    .filter(p => cat==="All" || p.cat===cat)
+    .map(p => `<div class="card"><img src="${p.img}" alt="${p.name}">
+      <div class="info"><h3>${p.name}</h3><small>${p.sub}</small>
+      <div class="price">${p.price ? "₹"+p.price : "Price on request"}</div>
+      ${p.price
+        ? `<button class="buy" onclick="buyNow(${p.id})">Buy Now</button>
+           <button onclick="add(${p.id})">Add to Cart</button>`
+        : `<button onclick="ask('${p.name}')">Ask on WhatsApp</button>`}
+      </div></div>`).join("");
+}
+
+function cur(){ return buyId ? {[buyId]: buyQty} : cart; }
+
+function add(id){
+  cart[id] = (cart[id]||0) + 1; update();
+  const t = document.getElementById("toast"); t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1200);
+}
+
+function buyNow(id){ buyId = id; buyQty = 1; openDrawer(); }
+
+function chg(id, d){
+  if(buyId){ buyQty = Math.max(1, buyQty + d); }
+  else { cart[id] += d; if(cart[id] <= 0) delete cart[id]; }
+  update();
+}
+
+function total(){
+  const c = cur();
+  return Object.keys(c).reduce((s,id) => s + products.find(p => p.id==id).price * c[id], 0);
+}
+
+function update(){
+  const n = Object.values(cart).reduce((a,b) => a+b, 0);
+  document.getElementById("count").textContent = n;
+  document.getElementById("count2").textContent = n;
+  document.querySelector("#panel h2").textContent = buyId ? "Buy Now" : "Your Cart";
+  const c = cur();
+  document.getElementById("items").innerHTML = Object.keys(c).map(id => {
+    const p = products.find(x => x.id==id);
+    return `<div class="row"><span>${p.name}</span><span>
+      <button onclick="chg(${id},-1)">−</button> ${c[id]} <button onclick="chg(${id},1)">+</button></span></div>`;
+  }).join("") || "<p>Your cart is empty.</p>";
+  document.getElementById("total").textContent = total();
+}
+
+function openCart(){ buyId = null; openDrawer(); }
+function openDrawer(){ update(); document.getElementById("drawer").style.display = "block"; }
+function closeCart(){ buyId = null; document.getElementById("drawer").style.display = "none"; }
+
+function placeOrder(){
+  const n = document.getElementById("name").value.trim(),
+        ph = document.getElementById("phone").value.trim(),
+        a = document.getElementById("addr").value.trim();
+  const c = cur();
+  if(!Object.keys(c).length) return alert("Your cart is empty.");
+  if(!n || !ph || !a) return alert("Please fill name, phone and address.");
+  const lines = Object.keys(c).map(id => {
+    const p = products.find(x => x.id==id);
+    return `${p.name} x ${c[id]} = ₹${p.price * c[id]}`;
+  }).join("\n");
+  const msg = `✨ New order - The Artistic Muse\n\n${lines}\n\nTotal: ₹${total()}\n\nName: ${n}\nPhone: ${ph}\nAddress: ${a}`;
+  window.open(`https://wa.me/${OWNER}?text=${encodeURIComponent(msg)}`, "_blank");
+  if(!buyId) cart = {};
+  closeCart(); update();
+}
+
+function ask(name){
+  const msg = `Hi! I'd like a custom ${name} from The Artistic Muse. Please share the price and options.`;
+  window.open(`https://wa.me/${OWNER}?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+render();
+</script>
+</body>
+</html>
